@@ -1,0 +1,131 @@
+#!/usr/bin/python
+
+#*********************************************************
+# Author: James Meehan
+# Assignment: CS372 Project 1
+# Date: February 11, 2018
+# Description: This Chat Server creates a socket and waits
+# for a new user connnection.  After receiving an initial
+# message from the client, server and client will alternate 
+# messages until either quits.  Presss control^c to exit the 
+# chat server program at any time.
+
+# Sources used:
+# IBM: Sockets programming in Python
+# www.ibm.com/developerworks/linus/tutorials/l-pysocks/
+# Python Documentation
+# docs.python.org/2/library/socket.html
+#******************************************************
+
+import sys
+import socket
+#import select
+
+HOST = ''
+HANDLE = "HAL9000"
+SOCKET_LIST = []
+MAXCHARACTERS = 500
+ 
+
+
+# Main function      
+def main():
+	# Start up the Chat Server
+	myServer = chatserver()
+	socket = myServer.start_Up()
+
+	# Until user terminates program
+	while 1:
+		# Wait for a new connection
+		sockfd, addr = myServer.connect(socket)
+		# After connecting alternate sending messages until client or server quit
+		while 1:
+			clientMsg = myServer.receiveMessage(sockfd, addr)
+			if '\quit' in repr(clientMsg):
+				break
+			svrMsg = myServer.sendMessage(sockfd, addr)
+			if '\quit' in repr(svrMsg):
+				break
+		#close the connnection when client or server quit
+		sockfd.close()
+
+class chatserver: 
+	##*******************************************************
+	## Description: the start_Up() function sets up a socket,
+	## binds it to the host and user identified port, and
+	## listens for a connection from a client.
+	##******************************************************
+	def start_Up(self):
+		# Make sure correct format was used
+		if(len(sys.argv) < 2) :
+			print "Use this format: ./chatserve [port]"
+ 
+		# Set port
+		port = int(sys.argv[1])
+
+		# Set up socket
+        	svrsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        	svrsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        	svrsocket.bind((HOST, port))
+        	svrsocket.listen(1)
+		
+		# Alert user that Chat Server succesfully started
+    		print 'ChatServer started on port ' + str(port)
+		print
+ 
+	        return svrsocket
+ 		
+	##**********************************************
+	## Description: the connect() function accepts 
+	## a connection from a client on the socket that 
+	## was created.  The usre is alerted that a 
+	## client has entered the chat room.
+	##**********************************************
+	def connect(self, svrsocket):
+ 		sockfd, addr = svrsocket.accept()
+ 		print "Client (%s, %s) has entered the chat room" % addr
+		print 'Wait for a client to initiate chat'
+		return (sockfd, addr)
+		
+	##**********************************************
+	## Description: the receiveMessage() function 
+	## recieves a message from the client and  
+	## displays it on the screen.  If the client 
+	## has sent '\quit' the user is alarted that
+	## the client has gone offline.
+	##**********************************************
+ 	def receiveMessage(self, sockfd, addr):
+ 		data = sockfd.recv(MAXCHARACTERS)
+
+ 		if data:
+
+ 			if '\quit' in repr(data):
+ 				print "Client (%s, %s) has gone offline" % addr
+ 				return data
+
+ 			else:
+ 				sys.stdout.write(data)
+ 				print
+ 				sys.stdout.write(HANDLE + '> ');
+ 				sys.stdout.flush()
+				return data
+		
+	##**********************************************
+	## Description: the sendMessage() function 
+	## gets a line of input from the user and sends
+	## that message to the client.  If the user 
+	## types '\quit' the user is alreted that the 
+	## connection with the client was terminated
+	##**********************************************
+	def sendMessage(self, sockfd, addr):
+ 		svrInput = sys.stdin.readline()
+ 		svrMsg = HANDLE + '> ' + svrInput
+ 		sockfd.send(svrMsg)
+ 		if '\quit' in repr(svrInput):
+ 			print "Server terminated connection with client (%s, %s)" % addr
+		return svrMsg
+															
+# Make sure main is called first
+if __name__ == '__main__':
+	main()
+
