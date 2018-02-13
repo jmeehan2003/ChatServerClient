@@ -2,11 +2,9 @@
 
 #*********************************************************
 # Author: James Meehan
-# Assignment: CS372 Project 1
-# Date: February 11, 2018
 # Description: This Chat Server creates a socket and waits
 # for a new user connnection.  After receiving an initial
-# message from the client, server and client will alternate 
+# message from the client, the server and client alternate 
 # messages until either quits.  Presss control^c to exit the 
 # chat server program at any time.
 
@@ -26,8 +24,6 @@ HANDLE = "HAL9000"
 SOCKET_LIST = []
 MAXCHARACTERS = 500
  
-
-
 # Main function      
 def main():
 	# Start up the Chat Server
