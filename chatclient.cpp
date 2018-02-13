@@ -1,8 +1,8 @@
 /*******************************************************************************
 ** Author: James Meehan
-** Description:  This is a chat client that connects to a chat sever on a port
+** Description:  This is a chat client that connects to a chat server on a port
 ** identified by the client on the command line.  The user can then communicate
-** with the server  by sending alternating messages. The program is terminated
+** with the server by sending alternating messages. The program is terminated
 ** by the user typing "\quit" or the server closing the connection.
 *******************************************************************************/
 
